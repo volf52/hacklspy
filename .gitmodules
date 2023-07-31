@@ -1,0 +1,3 @@
+[submodule "tree-sitter-hackasm"]
+	path = tree-sitter-hackasm
+	url = https://github.com/volf52/tree-sitter-hackasm

@@ -1,0 +1,5 @@
+@i
+// COmment to be ignored
+@ABC
+0;JMP // inline comment
+D=D-A

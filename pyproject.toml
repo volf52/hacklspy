@@ -1,0 +1,130 @@
+[tool.poetry]
+name = "hacklsp"
+version = "0.1.0"
+description = ""
+authors = ["Arslan <rslnkrmt2552@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "hacklsp", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+tree-sitter = "^0.20.1"
+pygls = "^1.0.2"
+lsprotocol = "^2023.0.0a2"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.0.281"
+black = "^23.7.0"
+isort = "^5.12.0"
+ipython = "^8.14.0"
+poethepoet = "^0.21.1"
+mypy = "^1.4.1"
+pytest = "^7.4.0"
+pytest-xdist = "^3.3.1"
+pytest-sugar = "^0.9.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks]
+test = "python -m pytest tests"
+tc = "dmypy run -- src cmd tests"
+sort = "isort -- src cmd tests"
+fmt = "black -- src cmd tests"
+lint = "ruff --ignore F401 -- src cmd tests"
+exec = "python"
+# start = "python server.py"
+
+[tool.poe.tasks.export]
+shell = """
+poetry export -o requirements.txt &
+poetry export --with=dev -o requirements-dev.txt
+"""
+
+[tool.flake8]
+max-line-length = 88
+
+[tool.isort]
+profile = "black"
+src_paths = ["src"]
+known_third_party = [
+  "openai",
+  "pydantic",
+  "loguru",
+  "speechrecognition",
+  "txtai",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py37', 'py38', 'py39', 'py310']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  # The following are specific to Black, you probably don't want those.
+  | blib2to3
+  | tests/data
+  | profiling
+)/
+'''
+
+[tool.pytest.ini_options]
+# asyncio_mode = false
+# trio_mode = "auto"
+addopts = "-vv --tb=short"
+norecursedirs = [".tox", ".git", "*/migrations/*", "*/static/*", "docs", "venv"]
+markers = [
+  "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+  "secondary: mark tests that use functionality tested in the same file (deselect with '-m \"not secondary\"')",
+]
+filterwarnings = ["error"]
+
+[tool.coverage.report]
+exclude_lines = [
+  # Have to re-enable the standard pragma
+  'pragma: no cover',
+
+  # Type checking can not be tested
+  'if TYPE_CHECKING:',
+
+  # Ignore the Abstract classes definition
+  'raise NotImplementedError',
+]
+
+[tool.mypy]
+show_error_codes = true
+#follow_imports = "silent"
+# ignore_missing_imports = false
+ignore_missing_imports = true
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+warn_unused_configs = true
+disallow_subclassing_any = false
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+disallow_untyped_calls = false
+disallow_untyped_defs = false
+# plugins = ["pydantic.mypy"]
+# mypy_path = "src"
+
+# [tool.pydantic-mypy]
+# init_forbid_extra = true
+# init_typed = true
+# warn_required_dynamic_aliases = true
+# warn_untyped_fields = true
