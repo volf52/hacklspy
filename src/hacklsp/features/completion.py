@@ -11,8 +11,8 @@ from lsprotocol.types import (
     CompletionTriggerKind,
 )
 
+from .descriptions import DESCRIPTIONS, KeywordType
 from .hackasm_server import HackAsmServer
-from .keywords import KEYWORDS, KeywordType
 
 
 @dataclass
@@ -29,7 +29,9 @@ LABEL_KIND = CompletionItemKind.Constant
 JUMP_KIND = CompletionItemKind.Keyword
 
 JUMP_KWS = [
-    (x, data.desc) for (x, data) in KEYWORDS.items() if data._type is KeywordType.Jump
+    (x, data.desc)
+    for (x, data) in DESCRIPTIONS.items()
+    if data._type is KeywordType.Jump
 ]
 JUMP_COMPLETION_ITEMS = CompletionList(
     is_incomplete=False,
@@ -58,6 +60,23 @@ def _label_list(ls: HackAsmServer, doc_uri: str) -> CompletionList:
     return completions
 
 
+_comp_items = [
+    CompletionItem(x, CompletionItemLabelDetails(f"Copy value from {x} register"))
+    for x in ["A", "M", "D"]
+]
+_comp_items.extend(
+    (
+        CompletionItem(x, CompletionItemLabelDetails(f"Set dest value to {data.desc}"))
+        for (x, data) in DESCRIPTIONS.items()
+        if data._type is KeywordType.Comp
+    )
+)
+COMP_COMPLETION_ITEMS = CompletionList(
+    is_incomplete=False,
+    items=_comp_items,
+)
+
+
 def setup_completion(server: HackAsmServer) -> None:
     @server.feature(
         TEXT_DOCUMENT_COMPLETION,
@@ -77,7 +96,7 @@ def setup_completion(server: HackAsmServer) -> None:
             case TriggerCharacter.AT:
                 return _label_list(ls, doc_uri)
             case TriggerCharacter.EQ:
-                return _comp_list(["compitem"])
+                return COMP_COMPLETION_ITEMS
             case TriggerCharacter.SEMI:
                 return JUMP_COMPLETION_ITEMS
 
