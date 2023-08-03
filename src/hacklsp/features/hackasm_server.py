@@ -16,15 +16,15 @@ class HackAsmServer(LanguageServer):
         super().__init__("hasklsp", __version__)
         self.ts_trees = dict()
 
-    def add_doc(self, uri: str, text: str) -> None:
+    async def add_doc(self, uri: str, text: str) -> None:
         tree = HACKASM_PARSER.parse(text.encode())
         self.ts_trees[uri] = tree
 
-    def remove_doc(self, uri: str) -> None:
+    async def remove_doc(self, uri: str) -> None:
         if self.ts_trees.get(uri) is not None:
             del self.ts_trees[uri]
 
-    def get_labels_for_doc(self, uri: str) -> list[str]:
+    async def get_labels_for_doc(self, uri: str) -> list[str]:
         tree = self.ts_trees.get(uri)
         if tree is None:
             return []

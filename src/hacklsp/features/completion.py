@@ -42,15 +42,8 @@ JUMP_COMPLETION_ITEMS = CompletionList(
 )
 
 
-def _comp_list(items: list[str] = []):
-    CompletionItemKind.Constant
-    return CompletionList(
-        is_incomplete=True, items=list(map(lambda x: CompletionItem(x), items))
-    )
-
-
-def _label_list(ls: HackAsmServer, doc_uri: str) -> CompletionList:
-    doc_labels = ls.get_labels_for_doc(doc_uri)
+async def _label_list(ls: HackAsmServer, doc_uri: str) -> CompletionList:
+    doc_labels = await ls.get_labels_for_doc(doc_uri)
 
     completions = CompletionList(
         is_incomplete=True,
@@ -94,7 +87,7 @@ def setup_completion(server: HackAsmServer) -> None:
         doc_uri = params.text_document.uri
         match params.context.trigger_character:
             case TriggerCharacter.AT:
-                return _label_list(ls, doc_uri)
+                return await _label_list(ls, doc_uri)
             case TriggerCharacter.EQ:
                 return COMP_COMPLETION_ITEMS
             case TriggerCharacter.SEMI:
