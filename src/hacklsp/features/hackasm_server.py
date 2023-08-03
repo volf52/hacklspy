@@ -20,6 +20,10 @@ class HackAsmServer(LanguageServer):
         tree = HACKASM_PARSER.parse(text.encode())
         self.ts_trees[uri] = tree
 
+    def remove_doc(self, uri: str) -> None:
+        if self.ts_trees.get(uri) is not None:
+            del self.ts_trees[uri]
+
     def get_labels_for_doc(self, uri: str) -> list[str]:
         tree = self.ts_trees.get(uri)
         if tree is None:
