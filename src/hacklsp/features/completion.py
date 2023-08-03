@@ -21,9 +21,12 @@ class TriggerCharacter:
 
 
 TRIGGER_CHARACTERS = [TriggerCharacter.AT, TriggerCharacter.SEMI, TriggerCharacter.EQ]
+JUMP_KWS = ["JMP", "JEQ", "JLE", "JGT", "JGE", "JLE", "JNE"]
+
 NO_COMPLETION: CompletionList = CompletionList(is_incomplete=False, items=[])
 
 LABEL_KIND = CompletionItemKind.Constant
+JUMP_KIND = CompletionItemKind.Keyword
 
 
 def _comp_list(items: list[str] = []):
@@ -31,6 +34,12 @@ def _comp_list(items: list[str] = []):
     return CompletionList(
         is_incomplete=True, items=list(map(lambda x: CompletionItem(x), items))
     )
+
+
+def _jump_list() -> CompletionList:
+    items = [CompletionItem(x, kind=JUMP_KIND) for x in JUMP_KWS]
+
+    return CompletionList(is_incomplete=False, items=items)
 
 
 def _label_list(ls: HackAsmServer, doc_uri: str) -> CompletionList:
@@ -65,6 +74,6 @@ def setup_completion(server: HackAsmServer) -> None:
             case TriggerCharacter.EQ:
                 return _comp_list(["compitem"])
             case TriggerCharacter.SEMI:
-                return _comp_list(["jmpitem"])
+                return _jump_list()
 
         return _comp_list()
