@@ -1,4 +1,10 @@
-from .features import HackAsmServer, setup_completion, setup_doc_crud, setup_initialize
+from .features import (
+    HackAsmServer,
+    setup_completion,
+    setup_doc_crud,
+    setup_hover,
+    setup_initialize,
+)
 
 # LANG_SERVER = LanguageServer("hacklsp", __version__)
 
@@ -9,5 +15,6 @@ def init_server() -> HackAsmServer:
     setup_initialize(server)
     setup_doc_crud(server)
     setup_completion(server)
+    setup_hover(server)
 
     return server
