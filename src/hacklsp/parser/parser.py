@@ -1,7 +1,9 @@
-from tree_sitter import Parser
+from tree_sitter import Language, Parser
 
-from .language import HACKASM_LANG
 
-HACKASM_PARSER = Parser()
+def init_hackasm_parser(lang: Language) -> Parser:
+    HACKASM_PARSER = Parser()
 
-HACKASM_PARSER.set_language(HACKASM_LANG)
+    HACKASM_PARSER.set_language(lang)
+
+    return HACKASM_PARSER

@@ -2,27 +2,29 @@ from typing import Callable
 
 from lsprotocol.types import Position
 from pygls.server import LanguageServer
-from tree_sitter import Node, Tree
+from tree_sitter import Node, Parser, Tree
 
-from hacklsp.parser import HACKASM_LANG, HACKASM_PARSER
+from hacklsp.parser import Queries
 from hacklsp.version import __version__
 
 from .node_utils import NodeDetails, traverse_tree
 
-LABEL_QUERY = HACKASM_LANG.query("(label_def (label_ident) @label)")
-
 
 class HackAsmServer(LanguageServer):
-    __slots__ = "ts_trees"
+    __slots__ = "ts_trees", "parser", "queries"
 
     ts_trees: dict[str, Tree]
+    parser: Parser
+    queries: Queries
 
-    def __init__(self):
+    def __init__(self, parser: Parser, queries: Queries):
         super().__init__("hasklsp", __version__)
         self.ts_trees = dict()
+        self.parser = parser
+        self.queries = queries
 
     async def add_doc(self, uri: str, text: str) -> None:
-        tree = HACKASM_PARSER.parse(text.encode())
+        tree = self.parser.parse(text.encode())
         self.ts_trees[uri] = tree
 
     async def remove_doc(self, uri: str) -> None:
@@ -35,6 +37,12 @@ class HackAsmServer(LanguageServer):
             self.ts_trees[new_uri] = tree
             del self.ts_trees[old_uri]
 
+    async def replace_doc(self, uri: str, text: str) -> None:
+        # old_tree = self.ts_trees.get(uri)
+        # tree = HACKASM_PARSER.parse(text.encode(), old_tree=old_tree)
+        tree = self.parser.parse(text.encode())
+        self.ts_trees[uri] = tree
+
     async def update_doc(self, uri: str) -> None:
         tree = self.ts_trees.get(uri)
         if tree is None:
@@ -45,7 +53,7 @@ class HackAsmServer(LanguageServer):
         if tree is None:
             return []
 
-        captures = LABEL_QUERY.captures(tree.root_node)
+        captures = self.queries.LABEL_QUERY.captures(tree.root_node)
         labels = []
         for cap, _ in captures:
             labels.append(cap.text.decode())

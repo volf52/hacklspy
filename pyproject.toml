@@ -30,6 +30,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poe.tasks]
 test = "python -m pytest tests"
+rblang.script = "hacklsp.rebuild_lang:main"
 tc = "dmypy run -- src cmd tests"
 sort = "isort -- src cmd tests"
 fmt = "black -- src cmd tests"
